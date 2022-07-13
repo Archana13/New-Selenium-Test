@@ -1,0 +1,116 @@
+package com.brainpop;
+
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.Test;
+import org.testng.Assert;
+import org.openqa.selenium.Keys;
+
+public class LoginPage_Test {
+	@Test
+	public void login_test() throws Exception {
+		System.setProperty("webdriver.chrome.driver", "C:\\Users\\Archana\\Documents\\Drivers\\chromedriver.exe");
+		WebDriver driver = new ChromeDriver();
+		driver.get("https://www.brainpop.com/");
+		Thread.sleep(2000);
+		driver.get("https://www.brainpop.com/");
+		driver.manage().window().maximize();
+		Thread.sleep(5000);
+		// Click on the log in button
+
+		driver.findElement(By.id("nli_log_in_button")).click();
+		Thread.sleep(2000);
+
+		// Find the user name and password
+
+		WebElement textbox_username = driver.findElement(By.id("login"));
+		textbox_username.sendKeys("qatest2022");
+		driver.findElement(By.id("password")).sendKeys("brainp0p");
+		driver.findElement(By.id("btnLogin")).click();
+		Thread.sleep(2000);
+		// driver.findElement(By.cssSelector("#continue")).click();
+		// Thread.sleep(2000);
+		String expectedURL = "https://www.brainpop.com/";
+		String expectedTitle = "BrainPOP";
+		String newUrl = driver.getCurrentUrl();
+		String newTitle = driver.getTitle();
+
+		// Checking for the right page
+
+		Assert.assertEquals(newUrl, expectedURL, "Verify URL of new page");
+		Assert.assertEquals(newTitle, expectedTitle, "Verify Title of new page");
+		Thread.sleep(5000);
+
+		// Search Query Challenge
+
+		WebElement search_textbox = driver.findElement(
+				By.xpath("/html/body/div[1]/div/div/header/div[2]/div/div/div[2]/div/div/div/div/div/div[2]/input"));
+
+		Thread.sleep(2000);
+		search_textbox.click();
+		search_textbox.sendKeys("Challenge");
+		search_textbox.sendKeys(Keys.ENTER);
+		Thread.sleep(5000);
+		// Verify search results
+
+		List<WebElement> links = driver.findElements(By.className("topic_name"));
+		int link_count = links.size();
+		int link_count_final = (link_count) - 2; //There are two instances of the className that are being used for comparison
+		System.out.println("Total number of links " + (link_count_final));
+
+		// Click on DNA
+
+		List<WebElement> search_dna = driver.findElements(By.linkText("DNA"));
+		search_dna.get(0).click();
+		Thread.sleep(7000);
+
+		// Movie Player validation (play and pause)
+
+		driver.findElement(By.id("play_movie")).click();
+		Thread.sleep(7000);
+		WebElement play_video = driver.findElement(By.id("play"));
+		play_video.click();
+		Thread.sleep(25000);
+
+		WebElement pause_video = driver.findElement(By.id("pause"));
+		pause_video.click();
+
+		// Closed Caption Validation
+
+		driver.findElement(By.id("caption")).click();
+		Thread.sleep(7000);
+		if (driver.getPageSource().contains("Do all animals have DNA?")) {
+			System.out.println("Closed captions work");
+		} else {
+			System.out.println("Closed captions don't work");
+		}
+
+		driver.findElement(By.id("caption")).click();
+		Thread.sleep(1000);
+
+		// Select the Related Reading Feature associated with the topic
+
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		js.executeScript("window.history.go(-1)");
+		Thread.sleep(7000);
+		WebElement related_reading = driver.findElement(By.id("feature_related_reading"));
+		related_reading.click();
+		Thread.sleep(7000);
+
+		String expectedURL2 = "https://www.brainpop.com/health/geneticsgrowthanddevelopment/dna/relatedreading/";
+		String newUrl2 = driver.getCurrentUrl();
+
+		// Checking if we are on the right URL
+
+		Assert.assertEquals(newUrl2, expectedURL2, "Verify URL of new page");
+		Thread.sleep(5000);
+
+		driver.close();
+		driver.quit();
+	}
+}
